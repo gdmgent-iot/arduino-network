@@ -1,5 +1,9 @@
-const brokerUrl = "ws://test.mosquitto.org";
-const brokerPort = 8080;
+const docentIP = "192.168.1.114";
+const brokerUrl = "ws://" + docentIP;
+const brokerPort = 9001;
+
+// const brokerUrl = "ws://test.mosquitto.org";
+// const brokerPort = 8080;
 
 const client = mqtt.connect(`${brokerUrl}:${brokerPort}`);
 const topic = "dps1/nm/alert";
