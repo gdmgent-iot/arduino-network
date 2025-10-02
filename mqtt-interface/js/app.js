@@ -28,7 +28,7 @@ client.on("connect", () => {
     if (err) addMessage("❗️ - Er ging iets mis");
     else addMessage("Geabonneerd op het topic");
 
-    client.publish(topic, "Hallo van Frederick");
+    // client.publish(topic, "Hallo van Frederick");
   });
 });
 
