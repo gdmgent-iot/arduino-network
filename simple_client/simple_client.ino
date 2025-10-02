@@ -4,7 +4,7 @@
 #include <Arduino_JSON.h>
 
 // de api declareren
-const char api[] = "catfact.ninja";
+const char api[] = "official-joke-api.appspot.com";
 const int api_port = 80;
 
 // code uit de les, te vinden op: https://github.com/gdmgent-iot/arduino-network
@@ -15,6 +15,10 @@ HttpClient http(wifi, api, api_port);
 // interval en last request
 unsigned long lastrequest = 0; // initieel is er nog geen last request
 unsigned long interval = 10000; // = 10 seconden
+
+// IP of another arduino
+const char* other_arduino_ip = "192.168.1.126";
+
 
 void connectToWiFi() {
   int attempts = 0;
@@ -58,8 +62,8 @@ void setup() {
 
 void loop() {
 
+  listenToCatFact(); 
   listenToClientMessages();
-  
 }
 
 void listenToCatFact() {
@@ -69,7 +73,38 @@ void listenToCatFact() {
   lastrequest = millis(); // update lastrequest
 
 
-  Serial.println("Requesting a cat fact from the API");
+  Serial.println("Requesting a fact from the API");
+
+  // vraag een fact op
+  http.get("/jokes/random");
+  int statusCode = http.responseStatusCode();
+  String response = http.responseBody();
+
+  Serial.print("Status code: ");
+  Serial.println(statusCode);
+
+  if(statusCode == 200) {
+    JSONVar jsonResponse = JSON.parse(response);
+    String fact = (const char*) jsonResponse["setup"];
+    fact += " - ";
+    fact += (const char*) jsonResponse["punchline"];
+    Serial.print("Fact: ");
+    Serial.println(fact);
+
+    // stuur de fact naar een andere arduino
+    WiFiClient client;
+    if (client.connect(other_arduino_ip, 5000)) {
+      Serial.println("Connected to other arduino, sending fact");
+      client.println(fact);
+      client.stop();
+    } else {
+      Serial.println("Connection to other arduino failed");
+    }
+    
+  } else {
+    Serial.println("Error in retrieving fact");
+  }
+  http.stop();
 
 
 
