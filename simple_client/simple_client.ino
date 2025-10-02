@@ -1,6 +1,6 @@
 #include "secrets.h"
 #include <WiFiNINA.h>
-#include <ArduinoHTTPClient>
+#include <ArduinoHttpClient.h>
 #include <Arduino_JSON.h>
 
 // de api declareren
@@ -9,8 +9,12 @@ const int api_port = 80;
 
 // code uit de les, te vinden op: https://github.com/gdmgent-iot/arduino-network
 WiFiServer server(5000);
-WiFiClient wifi
-HttpClient client(wifi, api, api_port);
+WiFiClient wifi;
+HttpClient http(wifi, api, api_port);
+
+// interval en last request
+unsigned long lastrequest = 0; // initieel is er nog geen last request
+unsigned long interval = 10000; // = 10 seconden
 
 void connectToWiFi() {
   int attempts = 0;
@@ -60,6 +64,15 @@ void loop() {
 
 void listenToCatFact() {
   
+  // wacht tot interval gepasseerd is
+  if(millis() - lastrequest < interval) return;
+  lastrequest = millis(); // update lastrequest
+
+
+  Serial.println("Requesting a cat fact from the API");
+
+
+
 }
 
 
